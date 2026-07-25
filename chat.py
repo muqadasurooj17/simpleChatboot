@@ -1,6 +1,5 @@
 from html import escape
 
-
 def user_bubble(text: str) -> str:
     safe = escape(text)
     return f"""
@@ -11,7 +10,6 @@ def user_bubble(text: str) -> str:
         <div class="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white text-lg">🙂</div>
     </div>
     """
-
 
 def bot_bubble(text: str) -> str:
     safe = escape(text)
@@ -35,8 +33,10 @@ def render_messages(messages: list[dict]) -> str:
     return "\n".join(parts)
 
 
-def render_page(messages: list[dict]) -> str:
+def render_page(messages: list[dict], username: str = "") -> str:
     chat_html = render_messages(messages)
+    safe_username = escape(username)
+
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -46,8 +46,15 @@ def render_page(messages: list[dict]) -> str:
 </head>
 <body class="bg-gray-900 flex flex-col h-screen text-white">
 
-<header class="bg-gray-800 p-4 text-center shadow">
-    <h1 class="text-3xl font-bold">🤖 ChatBot</h1>
+<header class="bg-gray-800 p-4 shadow flex items-center justify-between px-6">
+    <form method="post" action="/logout">
+        <button type="submit" class="bg-gray-700 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded 
+        font-semibold transition">
+            Logout
+        </button>
+    </form>
+    <span class="text-gray-300 text-sm absolute left-1/2 -translate-x-1/2">
+    <b> Hiiiii , {safe_username} </b> </span>
 </header>
 
 <main class="flex-1 flex flex-col p-4 overflow-hidden">
