@@ -76,8 +76,13 @@ async def signup(
         )
     except ValidationError as e:
         return HTMLResponse(render_create_user_page(error=format_validation_error(e)))
+    except Exception as e:
+        return HTMLResponse(render_create_user_page(error=f"Invalid input: {str(e)}"))
+    # existing = get_user_by_email(data.email)
 
+    print("Checking existing user...")
     existing = get_user_by_email(data.email)
+    print("Firestore query finished:", existing)
     if existing:
         return HTMLResponse(render_create_user_page(error="An account with this email already exists."))
 

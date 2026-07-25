@@ -62,6 +62,7 @@ def render_create_user_page(error: str | None = None) -> str:
             name="phone"
             class="w-full p-3 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Phone number"
+            required
         />
         <div class="flex gap-2">
             <input
@@ -70,11 +71,13 @@ def render_create_user_page(error: str | None = None) -> str:
                 min="1"
                 class="flex-1 p-3 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Age"
+                required
             />
             <input
                 name="country"
                 class="flex-1 p-3 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Country"
+                required
             />
         </div>
         <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white p-3 rounded font-semibold">

@@ -1,4 +1,5 @@
 from pydantic import BaseModel, EmailStr, field_validator, ValidationError
+import re
 
 
 class SignupData(BaseModel):
@@ -24,6 +25,18 @@ class SignupData(BaseModel):
             raise ValueError("Password must be at least 6 characters")
         return v
 
+    @field_validator("phone")
+    @classmethod
+    def valid_phone(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Phone number is required")
+        # allows optional leading +, then 7-15 digits (spaces/dashes stripped before checking)
+        cleaned = re.sub(r"[\s\-]", "", v)
+        if not re.fullmatch(r"\+?\d{7,15}", cleaned):
+            raise ValueError("Enter a valid phone number (digits only, optional +)")
+        return v
+
     @field_validator("age")
     @classmethod
     def valid_age(cls, v: int) -> int:
@@ -33,7 +46,6 @@ class SignupData(BaseModel):
 
 
 def format_validation_error(exc: ValidationError) -> str:
-    """Turn Pydantic's error list into one readable line per field."""
     messages = []
     for err in exc.errors():
         field = err["loc"][0]
