@@ -40,8 +40,8 @@ class SignupData(BaseModel):
     @field_validator("age")
     @classmethod
     def valid_age(cls, v: int) -> int:
-        if v < 1 or v > 120:
-            raise ValueError("Age must be between 1 and 120")
+        if v < 18 or v > 120:
+            raise ValueError("Age must be between 18 and 120")
         return v
 
 
