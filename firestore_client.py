@@ -74,3 +74,32 @@ def get_user_by_id(user_id: str):
         data["id"] = doc.id
         return data
     return None
+
+def get_last_messages_for_user(username: str, limit: int = 5):
+    # Step 1: find the user by username
+    user_query = db.collection("users").where("username", "==", username).limit(1).stream()
+    user_doc = next(user_query, None)
+    if not user_doc:
+        return []
+    user_id = user_doc.id
+
+    # Step 2: find their sessions
+    sessions = db.collection("chatSessions").where("userId", "==", user_id).stream()
+    session_ids = [s.id for s in sessions]
+    if not session_ids:
+        return []
+
+    # Step 3: get their messages
+    docs = (
+        db.collection("messages")
+        .where("sessionId", "in", session_ids)
+        .order_by("timestamp", direction=firestore.Query.DESCENDING)
+        .limit(limit)
+        .stream()
+    )
+    results = []
+    for doc in docs:
+        data = doc.to_dict()
+        data["id"] = doc.id
+        results.append(data)
+    return results

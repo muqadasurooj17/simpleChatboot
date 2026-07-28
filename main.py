@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Form, Request
+from fastapi import Header, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from dotenv import load_dotenv
 import os
@@ -15,6 +16,7 @@ from firestore_client import (
     insert_chat_session,
     insert_message,
     verify_password,
+    get_last_messages_for_user
 )
 from pydantic import ValidationError
 
@@ -24,6 +26,8 @@ app = FastAPI(title="ChatBot")
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel("models/gemini-flash-latest")
+
+ADMIN_API_KEY = os.getenv("ADMIN_API_KEY")
 
 user_messages: dict[str, list[dict]] = {}
 user_sessions: dict[str, str] = {}
@@ -158,6 +162,13 @@ async def clear(request: Request):
         user_messages[user_id].clear()
     return RedirectResponse("/", status_code=303)
 
+
+@app.get("/api/last-chats")
+async def last_chats(username: str, limit: int = 5, x_api_key: str = Header(None)):
+    if not ADMIN_API_KEY or x_api_key != ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    messages = get_last_messages_for_user(username=username, limit=limit)
+    return {"count": len(messages), "username": username, "messages": messages}
 
 if __name__ == "__main__":
     import uvicorn
